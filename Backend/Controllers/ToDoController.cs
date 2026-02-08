@@ -9,21 +9,7 @@ namespace api.Controllers;
 [Route("todo")]
 public class ToDoController : ControllerBase
 {
-    [HttpPost("test")]
-    public IActionResult TestAuth([FromHeader(Name = "Authorization")] string? authorization) // [FromForm] ToDoItem item
-    {
-        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
-        return Unauthorized();
-        var token = authorization["Bearer ".Length..];
-        var principal = AccountController.ValidateJWTToken(token);
-        if(principal == null) return Unauthorized();
-        var username = principal.Identity!.Name;
-        return Ok(new
-        {
-            status = "Success",
-            username = username
-        });
-    }
+    
 
     [HttpPost("create")]
     public IActionResult CreateItem([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CreateToDoItem item)

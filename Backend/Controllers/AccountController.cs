@@ -84,4 +84,20 @@ public class AccountController : ControllerBase
         if(!AccountManagement.CreateUserAccount(credentials.Name, credentials.Password)) return BadRequest("User already exists!");
         return Ok(new {status = "Success"});
     }
+
+    [HttpPost("testauth")]
+    public IActionResult TestAuth([FromHeader(Name = "Authorization")] string? authorization) // [FromForm] ToDoItem item
+    {
+        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
+        return Unauthorized();
+        var token = authorization["Bearer ".Length..];
+        var principal = AccountController.ValidateJWTToken(token);
+        if(principal == null) return Unauthorized();
+        var username = principal.Identity!.Name;
+        return Ok(new
+        {
+            status = "Success",
+            username = username
+        });
+    }
 }
