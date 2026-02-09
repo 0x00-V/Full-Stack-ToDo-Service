@@ -1,0 +1,45 @@
+public class ApiAuthMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly HttpClient _http;
+
+    public ApiAuthMiddleware(RequestDelegate next, HttpClient http)
+    {
+        _next = next;
+        _http = http;
+    }
+
+    public async Task InvokeAsync(HttpContext ctx)
+    {
+
+        if (ctx.Request.Path.StartsWithSegments("/Index") || ctx.Request.Path.StartsWithSegments("/") || ctx.Request.Path.StartsWithSegments("/account/logout"))
+        {
+            var jwt = ctx.Request.Cookies["jwt_session"];
+
+            if(string.IsNullOrEmpty(jwt))
+            {
+                ctx.Response.Redirect("/Account/Login");
+                return;
+            }
+            var req = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5005/account/me");
+            req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
+            var resp = await _http.SendAsync(req);
+            if(!resp.IsSuccessStatusCode)
+            {
+                ctx.Response.Redirect("/Account/Login");
+                return;
+            }
+            var body = await resp.Content.ReadFromJsonAsync<UserDetailsDTO>();
+            ctx.Items["Username"] = body!.Username;
+            
+        }
+        await _next(ctx);
+        return;
+
+            
+
+        
+
+       
+    }
+}

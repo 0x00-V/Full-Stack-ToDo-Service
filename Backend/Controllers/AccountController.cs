@@ -85,7 +85,7 @@ public class AccountController : ControllerBase
         return Ok(new {status = "Success"});
     }
 
-    [HttpPost("testauth")]
+    [HttpPost("me")]
     public IActionResult TestAuth([FromHeader(Name = "Authorization")] string? authorization) // [FromForm] ToDoItem item
     {
         if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
