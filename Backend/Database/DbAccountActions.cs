@@ -39,7 +39,7 @@ namespace api.dbactions
                 command.Parameters.AddWithValue("$username", username);
                 command.Parameters.AddWithValue("$password", hashedPassword);
                 command.ExecuteNonQuery();
-                return true;
+                return true; 
             } catch(SqliteException err)
             {
                 Console.WriteLine($"There was an error in AccountManagement.CreateUserAccount():\n{err}");

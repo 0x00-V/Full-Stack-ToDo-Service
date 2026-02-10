@@ -1,5 +1,14 @@
+
+
 html {
   font-size: 14px;
+  
+}
+
+html,body {
+  background-color: rgb(19, 19, 19);
+  color: white;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -28,4 +37,11 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+.validation-summary-errors ul,
+.validation-summary-errors li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }

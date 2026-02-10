@@ -11,8 +11,9 @@ public class ApiAuthMiddleware
 
     public async Task InvokeAsync(HttpContext ctx)
     {
-
-        if (ctx.Request.Path.StartsWithSegments("/Index") || ctx.Request.Path.StartsWithSegments("/") || ctx.Request.Path.StartsWithSegments("/account/logout"))
+        try
+        {
+            if (ctx.Request.Path.StartsWithSegments("/Index") || ctx.Request.Path.StartsWithSegments("/") || ctx.Request.Path.StartsWithSegments("/account/logout"))
         {
             var jwt = ctx.Request.Cookies["jwt_session"];
 
@@ -35,6 +36,11 @@ public class ApiAuthMiddleware
         }
         await _next(ctx);
         return;
+        } catch
+        {
+            ctx.Response.Redirect("/ServiceUnavailable");
+        }
+        
 
             
 
