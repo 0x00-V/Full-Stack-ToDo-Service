@@ -13,14 +13,13 @@ using System.Net.Http.Json;
 using dto;
 using todolist.Models;
 
-
 namespace todolist.Account
 {
     
-    public class LoginModel : PageModel
+    public class RegisterModel : PageModel
     {
         private readonly HttpClient _http;
-        public LoginModel(HttpClient http)
+        public RegisterModel(HttpClient http)
         {
             _http = http;
         }
@@ -33,16 +32,19 @@ namespace todolist.Account
             return Page();
         }
 
+        // FIX LATER!!
+
         public async Task<IActionResult> OnPostAsync()
         {
             if(!ModelState.IsValid) return Page();
 
-            var httpReqMsg = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5005/account/login"){
+            var httpReqMsg = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5005/account/register"){
                 Content = JsonContent.Create(new {name = Credential.Username, password = Credential.Password})};
             var resp = await _http.SendAsync(httpReqMsg);
+            Console.WriteLine(resp);
             if(!resp.IsSuccessStatusCode)
             {
-                ModelState.AddModelError("", "Invalid credentials");
+                ModelState.AddModelError("", "Username taken.");
                 return Page();
             }
             var loginResponse = await resp.Content.ReadFromJsonAsync<LoginResponse>();
@@ -51,15 +53,12 @@ namespace todolist.Account
                 ModelState.AddModelError("", "Invalid API response");
                 return Page();
             }
-            var jwt = loginResponse.AccessToken;
-            Response.Cookies.Append("jwt_session", jwt, new CookieOptions{ HttpOnly = true, Secure = false, SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddSeconds(loginResponse.ExpiresIn)});
-            return RedirectToPage("/index");
+            return RedirectToPage("/account/login");
         }
 
 
 
     }
-
 }
 
 
