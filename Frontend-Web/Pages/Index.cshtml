@@ -6,5 +6,15 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome  @Model.Username</h1>
-    <p>Logic for this will be added soon.</p>
+    @if (Model.Items.Any())
+    {
+        <ul style="list-style-type: none; padding-left: 0;">
+            @foreach (var item in Model.Items)
+            {
+                <li>@item.Title @item.Description @item.CreatedAt</li>
+            }
+        </ul>
+    } else{
+        <p>No todo items. Visit localhost:5005/swagger to view how to create items</p>
+    }
 </div>
