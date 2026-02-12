@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-using dto;
+using DTO;
 using todolist.Models;
 
 namespace todolist.Account

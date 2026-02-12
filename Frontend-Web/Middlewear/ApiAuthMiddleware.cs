@@ -1,3 +1,5 @@
+using DTO;
+
 public class ApiAuthMiddleware
 {
     private readonly RequestDelegate _next;
@@ -13,7 +15,7 @@ public class ApiAuthMiddleware
     {
         try
         {
-            if (ctx.Request.Path.StartsWithSegments("/Index") || ctx.Request.Path.StartsWithSegments("/") || ctx.Request.Path.StartsWithSegments("/account/logout"))
+            if (ctx.Request.Path.StartsWithSegments("/Index") || ctx.Request.Path.StartsWithSegments("/") || ctx.Request.Path.StartsWithSegments("/account/logout") || ctx.Request.Path.StartsWithSegments("/create"))
         {
             var jwt = ctx.Request.Cookies["jwt_session"];
 

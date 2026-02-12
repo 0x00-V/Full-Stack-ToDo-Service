@@ -1,5 +1,5 @@
 
-namespace dto
+namespace todolist.Models
 {
   public class LoginResponse
 {
