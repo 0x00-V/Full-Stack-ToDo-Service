@@ -6,7 +6,7 @@ namespace todolist.Account
 {
     public class LogoutModel : PageModel
     {
-        public IActionResult OnPost()
+        public IActionResult OnGet()
         {
             Response.Cookies.Delete(
                 "jwt_session",

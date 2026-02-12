@@ -28,7 +28,7 @@ public class ToDoController : ControllerBase
         return Ok(new { message = "Todo item created" });
     }
 
-    [HttpPost("get")]
+    [HttpGet("get")]
     public IActionResult GetItems([FromHeader(Name = "Authorization")] string? authorization)
     {
         if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))

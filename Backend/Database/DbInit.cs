@@ -29,6 +29,7 @@ namespace api.dbactions
             userId INTEGER NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
+            completed BOOL DEFAULT 0,
             created_at DATETIME NOT NULL,
             FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
             );

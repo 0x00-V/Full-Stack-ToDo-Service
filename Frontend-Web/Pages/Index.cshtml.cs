@@ -23,16 +23,15 @@ public class IndexModel : PageModel
         Username = HttpContext.Items["Username"] as string;
 
         string? jwt = HttpContext.Request.Cookies["jwt_session"];
-        var req = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5005/todo/get");
+        var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5005/todo/get");
         req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
         var resp = await _http.SendAsync(req);
         if(!resp.IsSuccessStatusCode)
         {
+           //Console.WriteLine("Error"); 
            return Page();
         }
         Items = await resp.Content.ReadFromJsonAsync<List<ToDoItem>>() ?? new List<ToDoItem>();
-
-
         return Page();
     }
 }

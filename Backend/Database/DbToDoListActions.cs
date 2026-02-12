@@ -51,7 +51,7 @@ namespace api.dbactions
                 int userId = Convert.ToInt32(result);
                 command.Parameters.Clear();
                 command.CommandText = """
-                    SELECT ItemId, userId, title, description, created_at
+                    SELECT ItemId, userId, title, description, completed, created_at
                     FROM todoitems
                     WHERE userId = $userId;
                 """;
@@ -66,7 +66,8 @@ namespace api.dbactions
                         UserId = reader.GetInt32(1),
                         Title = reader.GetString(2),
                         Description = reader.IsDBNull(3) ? null! : reader.GetString(3),
-                        CreatedAt = reader.GetDateTime(4)
+                        Completed = reader.GetBoolean(4),
+                        CreatedAt = reader.GetDateTime(5)
                     });
                 }
                 return items;

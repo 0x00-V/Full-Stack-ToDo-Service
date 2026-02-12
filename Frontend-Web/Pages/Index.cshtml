@@ -3,18 +3,34 @@
 @{
     ViewData["Title"] = "Home page";
 }
-
 <div class="text-center">
     <h1 class="display-4">Welcome  @Model.Username</h1>
+    <a href=""><p>Create To Do Item</p></a>
     @if (Model.Items.Any())
     {
-        <ul style="list-style-type: none; padding-left: 0;">
-            @foreach (var item in Model.Items)
+        
+        <table>
+            <tr style="vertical-align:top">
+                <th>Title</th>
+                <th style="padding-left: 1.2rem; padding-right: 1.2rem;">Description</th>
+                <th>Completed</th>
+                <th>Time Created</th>
+            </tr>
+            @foreach(var item in Model.Items)
             {
-                <li>@item.Title @item.Description @item.CreatedAt</li>
+                <tr style="vertical-align:bottom">
+                    
+                        <td>@item.Title</td>
+                        <td>@item.Description</td>
+                        <td><a href="/"><input type="checkbox" name="isActive" value="@item.Completed" style="pointer-events: none;"/></a></td>
+                        <td style="padding-right: 1.2rem;">@item.CreatedAt</td>
+                        <td>
+                            <a>Edit</a> | <a>Delete</a>
+                        </td>
+                </tr>
             }
-        </ul>
+        </table>
     } else{
-        <p>No todo items. Visit localhost:5005/swagger to view how to create items</p>
+        <p>No tasks!</p>
     }
 </div>

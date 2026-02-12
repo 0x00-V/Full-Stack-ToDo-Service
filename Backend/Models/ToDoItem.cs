@@ -6,8 +6,8 @@ namespace api.Models
         public required int UserId {get;set;}
         public required string Title {get;set;}
         public string Description {get;set;} = default!;
+        public bool Completed {get;set;} = false;
         public DateTime CreatedAt {get;set;} = DateTime.UtcNow;
-        //public bool Completed {get;set;} = false;
 
     }
 
