@@ -35,4 +35,25 @@ public class IndexModel : PageModel
         Items = await resp.Content.ReadFromJsonAsync<List<ToDoItem>>() ?? new List<ToDoItem>();
         return Page();
     }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var jwt = Request.Cookies["jwt_session"];
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Delete,
+            $"http://localhost:5005/todo/delete/{id}"
+        );
+
+        request.Headers.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
+
+        var response = await _http.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+        }
+        return RedirectToPage();
+    }
 }

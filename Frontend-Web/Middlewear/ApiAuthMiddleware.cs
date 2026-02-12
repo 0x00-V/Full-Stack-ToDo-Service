@@ -24,7 +24,7 @@ public class ApiAuthMiddleware
                 ctx.Response.Redirect("/Account/Login");
                 return;
             }
-            var req = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5005/account/me");
+            var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5005/account/me");
             req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
             var resp = await _http.SendAsync(req);
             if(!resp.IsSuccessStatusCode)

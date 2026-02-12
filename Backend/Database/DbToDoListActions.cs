@@ -78,22 +78,36 @@ namespace api.dbactions
             }
         }
 
+        public static bool DeleteItem(int item_id, string username)
+        {
+            try
+            {
+                using var connection = new SqliteConnection("Data Source=database.db");
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = """
+                SELECT userId FROM users WHERE username = $username LIMIT 1;
+                """;
+                command.Parameters.AddWithValue("$username", username);
+                var result = command.ExecuteScalar();
+                if (result == null) return false;
+                int userId =  Convert.ToInt32(result);
+                command.Parameters.Clear();
+                command.CommandText = """
+                DELETE FROM todoitems WHERE ItemId = $itemId and userId = $userId;
+                """;
+                command.Parameters.AddWithValue("$itemId", item_id);
+                command.Parameters.AddWithValue("$userId", userId);
+                int rowsDeleted = command.ExecuteNonQuery();
+                if(rowsDeleted < 1) return false;
+                return true;
+            } catch (SqliteException e) 
+            {
+                Console.WriteLine($"DeleteItem Error: {e}");
+                return false;
+            }
+            
+        }
+
     }
 }
-
-
-/*
-
-ToDoItems.cs Ref
-namespace api.Models
-{
-    public class ToDoItem
-    {
-        public int ItemId {get;set;}
-        //public required int Owner {get;set;}
-        public required string Title {get;set;}
-        public string Description {get;set;} = default!;
-        public bool Completed {get;set;} = false;
-    }
-}
-*/

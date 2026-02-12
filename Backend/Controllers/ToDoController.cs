@@ -43,4 +43,24 @@ public class ToDoController : ControllerBase
         var items = ToDoActions.GetItems(username);
         return Ok(items);
     }
+
+    [HttpDelete("delete/{id}")]
+    public IActionResult DeleteItems([FromHeader(Name = "Authorization")] string? authorization, [FromRoute] int id)
+    {
+        if(string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer")) return Unauthorized();
+
+        var token = authorization["Bearer ".Length..];
+        var principal = AccountController.ValidateJWTToken(token);
+        if(principal == null) return Unauthorized();
+
+        var username = principal.Identity!.Name;
+        if(username == null) return Unauthorized();
+
+        if(id < 0) return BadRequest();
+
+        bool result = ToDoActions.DeleteItem(id, username);
+        if (result == false) return BadRequest();
+
+        return Ok();
+    }
 }
