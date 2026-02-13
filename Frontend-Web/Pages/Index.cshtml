@@ -22,7 +22,7 @@
                     
                         <td>@item.Title</td>
                         <td>@item.Description</td>
-                        <td><a href="/"><input type="checkbox" name="isActive" value="@item.Completed" style="pointer-events: none;"/></a></td>
+                        <td><form method="post" asp-page-handler="ToggleStatus" asp-route-id="@item.ItemId" style="display:inline;"><button type="submit" class="btn btn-link"><input style="pointer-events: none;" type="checkbox" @(item.Completed ? "checked" : "") disabled /></button></form></td>
                         <td style="padding-right: 1.2rem;">@item.CreatedAt</td>
                         <td>
                             <a>Edit</a> | <form method="post" asp-page-handler="Delete" asp-route-id="@item.ItemId" style="display:inline;"><button type="submit" class="btn btn-link">Delete</button></form>

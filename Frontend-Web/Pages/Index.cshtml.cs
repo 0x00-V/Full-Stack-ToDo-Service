@@ -56,4 +56,26 @@ public class IndexModel : PageModel
         }
         return RedirectToPage();
     }
+
+    public async Task<IActionResult> OnPostToggleStatusAsync(int id)
+    {
+        Console.WriteLine("Procced");
+        var jwt = Request.Cookies["jwt_session"];
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Put,
+            $"http://localhost:5005/todo/update/{id}"
+        );
+
+        request.Headers.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
+
+        var response = await _http.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+        }
+        return RedirectToPage();
+    }
 }

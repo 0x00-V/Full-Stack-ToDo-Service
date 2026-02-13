@@ -77,6 +77,48 @@ namespace api.dbactions
                 return new List<ToDoItem>();
             }
         }
+        public static bool ToggleItem(int item_id, string username)
+        {
+            try
+            {
+                using var connection = new SqliteConnection("Data Source = database.db");
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = """
+                SELECT userId FROM users WHERE username = $username LIMIT 1;
+                """;
+                command.Parameters.AddWithValue("$username", username);
+                var result = command.ExecuteScalar();
+                if(result == null) return false;
+                int userId = Convert.ToInt32(result);
+                command.Parameters.Clear();
+                command.CommandText = """
+                SELECT completed FROM todoitems WHERE ItemId = $itemId and userId = $userId LIMIT 1;
+                """;
+                command.Parameters.AddWithValue("$itemId", item_id);
+                command.Parameters.AddWithValue("$userId", userId);
+                var response = command.ExecuteScalar();
+                bool item_status = Convert.ToBoolean(response);
+                command.Parameters.Clear();
+
+                command.CommandText = """
+                UPDATE todoitems SET completed = $status WHERE ItemId = $itemId and userId = $userId;
+                """;
+                bool new_status = false;
+                if(item_status) new_status = false;
+                else new_status = true;
+                command.Parameters.AddWithValue("$status", new_status);
+                command.Parameters.AddWithValue("$itemId", item_id);
+                command.Parameters.AddWithValue("$userId", userId);
+                command.ExecuteNonQuery();
+                return true;
+            } catch(SqliteException e)
+            {
+                Console.WriteLine($"ToggleItem Error: {e}");
+                return false;
+            }
+        }
+
 
         public static bool DeleteItem(int item_id, string username)
         {
