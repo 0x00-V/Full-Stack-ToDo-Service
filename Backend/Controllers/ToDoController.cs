@@ -45,6 +45,22 @@ public class ToDoController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("get/{id}")]
+    public IActionResult GetItem([FromHeader(Name = "Authorization")] string? authorization, [FromRoute] int id)
+    {
+        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
+        return Unauthorized();
+        var token = authorization["Bearer ".Length..];
+        var principal = AccountController.ValidateJWTToken(token);
+        if(principal == null) return Unauthorized();
+
+        var username = principal.Identity!.Name;
+        if(username == null) return Unauthorized();
+
+        var item = ToDoActions.GetItem(id, username);
+        return Ok(item);
+    }
+
     [HttpPut("edit/{id}")]
     public IActionResult EditItem([FromHeader(Name = "Authorization")] string? authorization, [FromRoute] int id)
     {

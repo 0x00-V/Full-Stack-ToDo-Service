@@ -77,6 +77,56 @@ namespace api.dbactions
                 return new List<ToDoItem>();
             }
         }
+
+        public static List<ToDoItem> GetItem(int item_id, string username)
+        {
+            try
+            {
+                using var connection = new SqliteConnection("Data Source=database.db");
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = """
+                    SELECT userId
+                    FROM users
+                    WHERE username = $username
+                    LIMIT 1;
+                """;
+                command.Parameters.AddWithValue("$username", username);
+                var result = command.ExecuteScalar();
+                if (result == null)
+                    return new List<ToDoItem>();
+                int userId = Convert.ToInt32(result);
+                command.Parameters.Clear();
+                command.CommandText = """
+                    SELECT ItemId, userId, title, description, completed, created_at
+                    FROM todoitems
+                    WHERE ItemId = $itemId and userId = $userId;
+                """;
+                command.Parameters.AddWithValue("$itemId", item_id);
+                command.Parameters.AddWithValue("$userId", userId);
+                using var reader = command.ExecuteReader();
+                var items = new List<ToDoItem>();
+                while (reader.Read())
+                {
+                    items.Add(new ToDoItem
+                    {
+                        ItemId = reader.GetInt32(0),
+                        UserId = reader.GetInt32(1),
+                        Title = reader.GetString(2),
+                        Description = reader.IsDBNull(3) ? null! : reader.GetString(3),
+                        Completed = reader.GetBoolean(4),
+                        CreatedAt = reader.GetDateTime(5)
+                    });
+                }
+                return items;
+            }
+            catch (SqliteException)
+            {
+                return new List<ToDoItem>();
+            }
+        }
+
+
         public static bool ToggleItem(int item_id, string username)
         {
             try
