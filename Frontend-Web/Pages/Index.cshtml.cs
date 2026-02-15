@@ -29,7 +29,6 @@ public class IndexModel : PageModel
         var resp = await _http.SendAsync(req);
         if(!resp.IsSuccessStatusCode)
         {
-           //Console.WriteLine("Error"); 
            return Page();
         }
         Items = await resp.Content.ReadFromJsonAsync<List<ToDoItem>>() ?? new List<ToDoItem>();
@@ -73,9 +72,7 @@ public class IndexModel : PageModel
         var response = await _http.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
-        {
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
-        }
+        {}
         return RedirectToPage();
     }
 }

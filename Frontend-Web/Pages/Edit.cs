@@ -16,20 +16,16 @@ namespace todolist.Edit
             _http = http;
         }
 
-
         [BindProperty]
         public ToDoItem Task{get; set;} = new();
         public async Task<IActionResult> OnGet(int id)
         {
             var jwt = HttpContext.Request.Cookies["jwt_session"];
-
             if (string.IsNullOrEmpty(jwt))
                 return RedirectToPage("/Account/Login");
-
             var httpReqMsg = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:5005/todo/get/{id}");
             httpReqMsg.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
-
             var response = await _http.SendAsync(httpReqMsg);
             if (!response.IsSuccessStatusCode)
             {
@@ -58,7 +54,6 @@ namespace todolist.Edit
                 ModelState.AddModelError("", $"API Error: {statusCode} | {responseBody}");
                 return Page();
             }
-            Console.WriteLine(response);
             return RedirectToPage("/index");
         }
     }  

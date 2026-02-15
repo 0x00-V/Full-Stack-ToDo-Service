@@ -16,35 +16,28 @@ public class ApiAuthMiddleware
         try
         {
             var path = ctx.Request.Path.Value?.ToLower();
-            if (path != null &&
-    !path.StartsWith("/account/login") &&
-    !path.StartsWith("/account/register") &&
-    !path.StartsWith("/serviceunavailable") &&
-    !path.StartsWith("/css") &&
-    !path.StartsWith("/js") &&
-    !path.StartsWith("/lib"))
-{
-            var jwt = ctx.Request.Cookies["jwt_session"];
+            if (path != null && !path.StartsWith("/account/login") && !path.StartsWith("/account/register") && !path.StartsWith("/serviceunavailable") && !path.StartsWith("/css") && !path.StartsWith("/js") && !path.StartsWith("/lib"))
+            {
+                var jwt = ctx.Request.Cookies["jwt_session"];
 
-            if(string.IsNullOrEmpty(jwt))
-            {
-                ctx.Response.Redirect("/Account/Login");
-                return;
+                if(string.IsNullOrEmpty(jwt))
+                {
+                    ctx.Response.Redirect("/Account/Login");
+                    return;
+                }
+                var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5005/account/me");
+                req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
+                var resp = await _http.SendAsync(req);
+                if(!resp.IsSuccessStatusCode)
+                {
+                    ctx.Response.Redirect("/Account/Login");
+                    return;
+                }
+                var body = await resp.Content.ReadFromJsonAsync<UserDetailsDTO>();
+                ctx.Items["Username"] = body!.Username;
             }
-            var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5005/account/me");
-            req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
-            var resp = await _http.SendAsync(req);
-            if(!resp.IsSuccessStatusCode)
-            {
-                ctx.Response.Redirect("/Account/Login");
-                return;
-            }
-            var body = await resp.Content.ReadFromJsonAsync<UserDetailsDTO>();
-            ctx.Items["Username"] = body!.Username;
-            
-        }
-        await _next(ctx);
-        return;
+            await _next(ctx);
+            return;
         } catch (HttpRequestException e)
         {
             Console.WriteLine(e);
