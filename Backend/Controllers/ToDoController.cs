@@ -62,9 +62,21 @@ public class ToDoController : ControllerBase
     }
 
     [HttpPut("edit/{id}")]
-    public IActionResult EditItem([FromHeader(Name = "Authorization")] string? authorization, [FromRoute] int id)
+    public IActionResult EditItem([FromHeader(Name = "Authorization")] string? authorization, [FromRoute] int id, [FromBody] CreateToDoItem todoitem)
     {
-        return BadRequest("Not Implemented Yet.");
+        if(string.IsNullOrEmpty(todoitem.Title) || string.IsNullOrEmpty(todoitem.Description)) return BadRequest();
+        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
+        return Unauthorized();
+        var token = authorization["Bearer ".Length..];
+        var principal = AccountController.ValidateJWTToken(token);
+        if(principal == null) return Unauthorized();
+
+        var username = principal.Identity!.Name;
+        if(username == null) return Unauthorized();
+
+        var item = ToDoActions.UpdateItem(id, username, todoitem.Title, todoitem.Description);
+        if(item == false) return BadRequest();
+        return Ok("Item Updated.");
     }
 
     [HttpPut("update/{id}")]

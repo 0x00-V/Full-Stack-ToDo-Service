@@ -1,0 +1,35 @@
+@page "{id:int}"
+@model todolist.Edit.EditModel
+@{}
+
+
+
+<h1>Edit Task</h1>
+<div class="container border" style="padding:20px;">
+    <form method="POST">
+    <div class="form-group row mb-1">
+            <span class="text-danger" asp-validation-for="Task.Title"></span>
+            <div class="col-2">
+                <label asp-for="Task.Title">Title</label>
+            </div>
+            <div class="col-5">
+                <input type="text" asp-for="Task.Title" class="form-control" style="background-color: rgb(19, 19, 19); color: white;">
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <span class="text-danger" asp-validation-for="Task.Description"></span>
+            <div class="col-2">
+                <label asp-for="Task.Description">Description</label>
+            </div>
+            <div class="col-5">
+                <input type="text" asp-for="Task.Description" class="form-control" style="background-color: rgb(19, 19, 19); color: white;">
+            </div>
+        </div>
+        <div class="text-danger" asp-validation-summary="ModelOnly" style="list-style:none; padding-left:0;"></div>
+        <div class="form-group row mb-1">
+            <div class="col-2">
+                <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+        </div>
+    </form>
+</div>

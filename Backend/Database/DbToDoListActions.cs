@@ -78,7 +78,7 @@ namespace api.dbactions
             }
         }
 
-        public static List<ToDoItem> GetItem(int item_id, string username)
+        public static ToDoItem? GetItem(int item_id, string username)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace api.dbactions
                 command.Parameters.AddWithValue("$username", username);
                 var result = command.ExecuteScalar();
                 if (result == null)
-                    return new List<ToDoItem>();
+                    return null;
                 int userId = Convert.ToInt32(result);
                 command.Parameters.Clear();
                 command.CommandText = """
@@ -105,27 +105,63 @@ namespace api.dbactions
                 command.Parameters.AddWithValue("$itemId", item_id);
                 command.Parameters.AddWithValue("$userId", userId);
                 using var reader = command.ExecuteReader();
-                var items = new List<ToDoItem>();
-                while (reader.Read())
+                if(!reader.Read()) return null;
+                return  new ToDoItem
                 {
-                    items.Add(new ToDoItem
-                    {
-                        ItemId = reader.GetInt32(0),
-                        UserId = reader.GetInt32(1),
-                        Title = reader.GetString(2),
-                        Description = reader.IsDBNull(3) ? null! : reader.GetString(3),
-                        Completed = reader.GetBoolean(4),
-                        CreatedAt = reader.GetDateTime(5)
-                    });
-                }
-                return items;
+                    ItemId = reader.GetInt32(0),
+                    UserId = reader.GetInt32(1),
+                    Title = reader.GetString(2),
+                    Description = reader.IsDBNull(3) ? null! : reader.GetString(3),
+                    Completed = reader.GetBoolean(4),
+                    CreatedAt = reader.GetDateTime(5)
+                }; 
             }
             catch (SqliteException)
             {
-                return new List<ToDoItem>();
+                return null;
             }
         }
 
+
+        public static bool UpdateItem(int item_id, string username, string title, string description)
+        {
+            try
+            {
+                using var connection = new SqliteConnection("Data Source = database.db");
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = """
+                SELECT userId FROM users WHERE username = $username LIMIT 1;
+                """;
+                command.Parameters.AddWithValue("$username", username);
+                var result = command.ExecuteScalar();
+                if(result == null) return false;
+                int userId = Convert.ToInt32(result);
+                command.Parameters.Clear();
+                command.CommandText = """
+                SELECT completed FROM todoitems WHERE ItemId = $itemId and userId = $userId LIMIT 1;
+                """;
+                command.Parameters.AddWithValue("$itemId", item_id);
+                command.Parameters.AddWithValue("$userId", userId);
+                var response = command.ExecuteScalar();
+                bool item_status = Convert.ToBoolean(response);
+                command.Parameters.Clear();
+
+                command.CommandText = """
+                UPDATE todoitems SET title = $title, description = $description WHERE ItemId = $itemId and userId = $userId;
+                """;
+                command.Parameters.AddWithValue("$title", title);
+                command.Parameters.AddWithValue("$description", description);
+                command.Parameters.AddWithValue("$itemId", item_id);
+                command.Parameters.AddWithValue("$userId", userId);
+                command.ExecuteNonQuery();
+                return true;
+            } catch(SqliteException e)
+            {
+                Console.WriteLine($"UpdateItem Error: {e}");
+                return false;
+            }
+        }
 
         public static bool ToggleItem(int item_id, string username)
         {

@@ -15,8 +15,15 @@ public class ApiAuthMiddleware
     {
         try
         {
-            if (ctx.Request.Path.StartsWithSegments("/Index") || ctx.Request.Path.StartsWithSegments("/") || ctx.Request.Path.StartsWithSegments("/account/logout") || ctx.Request.Path.StartsWithSegments("/create"))
-        {
+            var path = ctx.Request.Path.Value?.ToLower();
+            if (path != null &&
+    !path.StartsWith("/account/login") &&
+    !path.StartsWith("/account/register") &&
+    !path.StartsWith("/serviceunavailable") &&
+    !path.StartsWith("/css") &&
+    !path.StartsWith("/js") &&
+    !path.StartsWith("/lib"))
+{
             var jwt = ctx.Request.Cookies["jwt_session"];
 
             if(string.IsNullOrEmpty(jwt))
@@ -38,16 +45,10 @@ public class ApiAuthMiddleware
         }
         await _next(ctx);
         return;
-        } catch
+        } catch (HttpRequestException e)
         {
+            Console.WriteLine(e);
             ctx.Response.Redirect("/ServiceUnavailable");
         }
-        
-
-            
-
-        
-
-       
     }
 }
